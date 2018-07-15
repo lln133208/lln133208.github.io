@@ -1,0 +1,77 @@
+---
+layout: post
+title: log
+date: 2018-06-10 20:32:00 +08:00
+tags: log
+---
+
+# logging #
+
+主要组件:
+
++ logger实例，通过其方法来记录日志
++ handler，将日志发送到不同的目标域
++ formatter，日志的输出格式
+
+
+## Usage ##
+
+1. 创建logger
+
+
+        import logging
+        logger = logging.getLogger('test')
+
+
+    logging.getLogger()指定同一个name，则生成的为同一个logger对象，而使用logging.Logger()来实例化则不能保证，因此在多模块中使用第一种方法。
+
+2. 配置Logger对象的日志级别
+
+        logger.setLevel(logging.DEBUG)
+
+    每条log都有对应的级别，本质上是一个非负整数。
+
+    |级别|对应的值|
+    |:-:|:-:|
+    |CRITICAL|50|
+    |ERROR|40|
+    |WARNING|30|
+    |INFO|20|
+    |DEBUG|10|
+    |NOTEST|0|
+
+    级别低于logger对象的消息将被忽略，可以通过logger.setLevel()来设置logger的日志级别。
+
+    > logger的默认日志级别为warning(warn与warning相同)，即使设置handler的日志级别低于warning，低于该级别的日志还是不能正常输出。
+
+3. 创建handler并绑定
+
+    handler负责将日志分发到某个输出，一个logger可以绑定多个handler。
+
+    创建一个日志输出到file的handler
+
+
+        logfile = logging.FileHandler('path/of/logfile')
+
+
+    创建一个日志输出到终端的handler
+
+
+        console = logging.StreamHandler()
+
+
+    每个handler都可以设置各自的日志级别，每条日志根据其级别进行输出。
+
+    handler还可以设置输出格式
+
+
+
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        logfile.setFormatter(formatter)
+
+
+    绑定handler
+
+
+        logger.addHandler(logfile)
+        logger.addHandler(console)

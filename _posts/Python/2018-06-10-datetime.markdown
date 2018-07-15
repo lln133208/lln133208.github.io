@@ -1,0 +1,109 @@
+---
+layout: post
+title: datetime
+date: 2018-06-10 17:48:00 +08:00
+tags: Python datetime
+---
+
+# datetime #
+datetime模块中包含3个主要类
+
++ datetime
++ timedelta
++ timezone
+
+## 当前时间 ##
+
+    from datetime import datetime
+    now = datetime.now()
+
+`now`的类型是Class datetime.datetime
+
+## 指定日期时间 ##
+
+
+    from datetime import datetime
+    dt = datetime(2016, 10, 19, 14, 13, 00)
+
+datetime构建
+
+    class datetime.datetime(year, month, day, hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
+
+`tzinfo`指定datetime的时区信息,默认为**None**,因此这种方式构造的datetime对象为本地时区。
+
+## timestamp ##
+
+timestamp与时区无关，计算机内部存储时间一般存储timestamp，UTC时间确定后可以转换到任意时区。
+
+datetime对象转换成timestamp
+
+    from datetime import datetime
+    dt = datetime(2016, 10, 19, 14, 13, 00)
+    ts = dt.timestamp()
+
+> Python的timestamp是一个浮点数，小数点后表示毫秒数。
+
+---
+
+timestamp转换成本地时区的datetime对象
+
+    from datetime import datetime
+    ts = 142917200.0
+    dt = datetime.fromtimestamp(ts)
+
+timestamp转换成UTC标准时区的datetime对象
+
+    from datetime import datetime
+    ts = 142917200.0
+    dt = datetime.utcfromtimestamp(ts)
+
+## str格式的时间 ##
+
+string格式的时间转换成datetime
+
+    from datetime import datetime
+    cday = datetime.strptime('2016-10-19 15:30:00', '%Y-%m-%d %H:%M:%S')
+
+---
+
+datetime转换成string
+
+    from datetime import datetime
+    now = datetime.now()
+    str_time = now.strftime('%Y-%m-%d %H:%M:%S')
+
+
+常用格式化字符的含义
+
+|Directive|Meaning|
+|:-:|:-:|
+|%Y|Year with century as a decimal number|
+|%y|Year without century as a decimal number [00,99]|
+|%m|Month as a decimal number [01,12]|
+|%d|Day of the month as a decimal number [01,31]|
+|%H|Hour (24-hour clock) as a decimal number [00,23]|
+|%M|Minute as a decimal number [00,59]|
+|%S|Second as a decimal number [00,61]|
+|%a|Locale’s abbreviated weekday name|
+|%A|Locale’s full weekday name|
+|%b|Locale’s abbreviated month name|
+|%B|Locale’s full month name|
+
+## datetime加减 ##
+
+    from datetime import datetime, timedelta
+    now = datetime.now()
+    dt_new = now + timedelta(hours=1)
+
+## 本地时间转换为UTC时间 ##
+
+得到一个datetime对象后设置时区属性
+
+    from datetime import datetime, timedelta, timezone
+    now = datetime.now()
+    tz_utc_8 = timezone(timedelta(hours=8))
+    now.replace(tzinfo=tz_utc_8)
+
+## 时区转换 ##
+
+对于一个datetime，强制设置正确时区做为基准时间，通过`astimezone()`转换时区。

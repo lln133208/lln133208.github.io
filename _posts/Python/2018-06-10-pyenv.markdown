@@ -1,0 +1,89 @@
+---
+layout: post
+title: pyenv
+date: 2018-06-10 20:28:00 +08:00
+tags: pyenv
+---
+
+# pyenv #
+
+## Install ##
+
+```
+$ git clone https://github.com/yyuu/pyenv.git ~/.pyenv
+$ echo 'export PYENV_ROOT="$HOME/.pyenv"'>> ~/.zshrc
+$ echo 'export PATH="$PYENV_ROOT/bin:$PATH"'>> ~/.zshrc
+$ echo 'eval "$(pyenv init -)"' >> ~/.zshrc
+$ exec "$SHELL"
+```
+
+## Upgrade ##
+
+```
+$ cd ~/.pyenv
+$ git pull
+$ pyenv rehash
+```
+
+## Usage ##
+
+### system dependencies ###
+
++ Mac OS X
+
+```
+$ brew install openssl readline xz
+```
+
++ debian/ubuntu
+
+```
+$ apt-get update
+$ apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev xz-utils
+
+```
+
+### list installed versions ###
+
+```
+$ pyenv versions
+```
+
+### list all availalbe versions ###
+
+```
+$ pyenv install --list
+```
+
+### install specified version ##
+
+```
+$ pyenv install x.x.x
+```
+
+### update pyenv database ###
+
+```
+$ pyenv rehash
+```
+
+### pyenv-virtualenv ###
+
+```
+$ git clone https://github.com/yyuu/pyenv-virtualenv.git ~/.pyenv/plugins/pyenv-virtualenv
+$ echo 'eval "$(pyenv virtualenv-init -)"' >> ~/.zshrc
+$ exec "$SHELL"
+```
+
+#### create virtualenv ####
+
+```
+$ pyenv virtualenv x.x.x virtualenv-name
+```
+
+#### activate and deactivate virtualenv ####
+
+```
+$ pyenv activate <virtualenv-name>
+$ pyenv deactivate
+```

@@ -1,0 +1,61 @@
+---
+layout: post
+title: hash
+date: 2018-06-10 20:26:00 +08:00
+tags: Python hash
+---
+
+# hashlib #
+
+`hashlib`提供常见的hash算法，如md5、sha1、sha256等。
+
+> 这些算法先前叫做`message digest`，现在叫做`secure hash`。
+
+## Usage ##
+
+### Construct ###
+两种方法来构造hash object，一个为跟算法同名的构造函数，另一个是通用的构造函数。
+
++ 以md5()为例，可以构造一个md5 hash实例
+
+```
+import hashlib
+m = hashlib.md5()
+m.update(b'hello world')
+result = m.digest()
+```
+
++ new(name[, date])
+第一个参数是hash算法名，这种构建方法没有上一种快。
+
+
+### update the hash object with the bytes ###
+
+这里需要注意的是update方法的参数为**bytes类型**。
+
+连续多次调用实例的`update`方法，与处理结合的结果等效，如下列两个代码块等价。
+
+```
+m.update(b'hello')
+m.update(b' world')
+m.digest()
+
+m.update(b'hello world')
+m.digest()
+```
+
+### 计算hash ###
+
+hash.digest()返回调用此方法之前的所有update中的参数的hash结果，类型为bytes，大小为hash.digest_size
+
+
+hash.hexdigest()返回string格式结果。
+
+### 属性 ###
+
+|属性|说明|
+|-|-|
+|hashlib.alogrithms_guaranteed|所有平台上都被此模块支持的算法集合|
+|hash.digest_size|hash结果字节大小|
+|hash.block_size|hash算法的内部块字节大小|
+|hash.name|算法名称，一般为小写|
