@@ -5,9 +5,6 @@ date: 2018-06-10 20:24:00 +08:00
 tags: git
 ---
 
-
-# subtree #
-
 `git subtree`用来解决嵌套项目版本管理的问题。
 
 ## Usage ##

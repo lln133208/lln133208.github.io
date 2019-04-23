@@ -5,8 +5,6 @@ date: 2018-06-10 20:26:00 +08:00
 tags: Python hash
 ---
 
-# hashlib #
-
 `hashlib`提供常见的hash算法，如md5、sha1、sha256等。
 
 > 这些算法先前叫做`message digest`，现在叫做`secure hash`。

@@ -5,8 +5,6 @@ date: 2018-06-10 20:27:00 +08:00
 tags: pip
 ---
 
-# pip离线安装 #
-
 `pip install --download`命令在pip 10之后被弃用，改为`pip download`。
 
 

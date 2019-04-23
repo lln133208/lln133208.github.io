@@ -5,7 +5,7 @@ date: 2018-07-14 20:33:00 +08:00
 tags: git
 ---
 
-# Git useful command #
+Record useful git command in this page.
 
 1. search commits contains a log message
 

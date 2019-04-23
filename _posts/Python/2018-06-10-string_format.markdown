@@ -5,7 +5,7 @@ date: 2018-06-10 20:33:00 +08:00
 tags: string
 ---
 
-# str.format() #
+Python的字符串格式化输出
 
 ## Basic formatting ##
 
