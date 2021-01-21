@@ -1,0 +1,20 @@
+---
+layout: post
+title: Add TOC for Jekyll
+categories: [Jekyll]
+---
+
+Repo: https://github.com/allejo/jekyll-toc
+
+Usage:
+
+1. Download the toc.html file from the latest release or the master branch
+
+2. Toss that file in your _includes folder.
+
+3. Use it in your template layout where you have {{"{{"}} content {{"}}}} which is the HTML rendered from the markdown source with this liquid tag
+
+    ```
+    {% include toc.html html=content %}
+    ```
+
