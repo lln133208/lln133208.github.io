@@ -69,6 +69,42 @@ int tmin()
 }
 ```
 
+## isTmax
+
+### 题目要求
+
+```
+/*
+ * isTmax - returns 1 if x is the maximum, two's complement number,
+ *     and 0 otherwise 
+ *   Legal ops: ! ~ & ^ | +
+ *   Max ops: 10
+ *   Rating: 1
+ */
+```
+
+### 解题思路
+
+Tmax ： 符号位为0，其余位都为1。因此Tmax有个特点是，Tmax加1会导致溢出，结果变成Tmin。下图以8bit为例
+
+```
+|Tmax   | 0 1 1 1 1 1 1 1|
+|1      | 0 0 0 0 0 0 0 1|
+|———————|———————————————-|
+|result | 1 0 0 0 0 0 0 0|
+```
+而 Tmax + Tmin + 1 = 0， 因此`(x+1+x+1)==0`可以用来判断x是否为Tmax。需要注意的是，还有一个特殊的例子也是满足这个等式的，那就是当x==0xff时，因此需要排除这个例外。如果排除这个例外呢，就需要仔细想想0xff和Tmax有啥不同的点。如果对0xff和Tmax都按位取反，会发现~0xff = 0, 而~Tmax != 0。 对于!!(~x)， 当x==0xff时，结果为0，而x==Tmax时，结果为1。
+
+```
+int isTmax(int x)
+{
+    int is_tmax_or_0xff = !(x+1+x+1);
+    // is_tmax_or_0xff 用来判断该数是否为0xff或Tmax
+    // (!!(~x))用来排除是否为0xff
+    return is_tmax_or_0xff&(!!(~x));
+}
+```
+
 ## isAsciiDigit
 
 ### 题目要求
