@@ -105,6 +105,76 @@ int isTmax(int x)
 }
 ```
 
+## allOddBits
+
+### 题目要求
+```
+/* 
+ * allOddBits - return 1 if all odd-numbered bits in word set to 1
+ *   where bits are numbered from 0 (least significant) to 31 (most significant)
+ *   Examples allOddBits(0xFFFFFFFD) = 0, allOddBits(0xAAAAAAAA) = 1
+ *   Legal ops: ! ~ & ^ | + << >>
+ *   Max ops: 12
+ *   Rating: 2
+ */
+```
+
+### 解题思路
+
+我自己的思路既然要判断所有偶数位是否为1，那就得想办法先提取这些位来
+1. 构造一个偶数位为**1**，奇数位为**0**的 int 数 **0xAAAAAAAA**， 假设命名为**allOddIs1**
+2. 将该数与**allOddIs1**进行按位与 `allOddIs1&x`
+
+如果该数的偶数位都为1，按位与的结果与**(~allOddIs1)+1** 互为相反数。 而该数的任意偶数位不为1时，按位与的结果与**(~allOddIs1)+1**不会是互为相反数。因此我们可以利用这个规律来解题。
+
+```
+int allOddBits(int x)
+{
+	int allOddIs1 = (0xAA<<24)+(0xAA<<16)+(0xAA<<8)+0xAA;
+	return !(allOddIs1&x + ~allOddIs1 + 1);
+}
+```
+---
+另外一种思路是通过移位操作，依次将所有偶数位按位与到 低2位。只有所有的偶数位都为1时，最终结果的偶数位才能为1.
+
+```
+int allOddBits(int x)
+{
+    int a = (x&x>>2);
+    int b = (a&a>>4);
+    int c = (b&b>>8);
+    int d = (c&c>>16);
+    return (d>>1)&0x01;  
+}
+```
+
+## negate
+
+### 题目要求
+
+```
+/* 
+ * negate - return -x 
+ *   Example: negate(1) = -1.
+ *   Legal ops: ! ~ & ^ | + << >>
+ *   Max ops: 5
+ *   Rating: 2
+ */
+```
+
+### 解题思路
+
+x + (~x) = -1
+x + (~x) + 1 = 0
+因此x的相反数时 (~x)+1
+
+```
+int negate(int x)
+{
+    return (~x)+1;
+}
+```
+
 ## isAsciiDigit
 
 ### 题目要求
@@ -137,3 +207,170 @@ int isAsciiDigit(int x)
 	return great_than_0x30&less_than_0x39;
 }
 ```
+
+## conditional
+
+### 题目要求
+
+```
+/* 
+ * conditional - same as x ? y : z 
+ *   Example: conditional(2,4,5) = 4
+ *   Legal ops: ! ~ & ^ | + << >>
+ *   Max ops: 16
+ *   Rating: 3
+ */
+```
+
+### 解题思路
+
+这道题需要将x这个条件变化成全1或者全0。将任意一个数变成0或1，一般考虑使用取反**!**运算符，这样结果要不是0x01，要不是0x00。此时先利用左移将最低位移至符号位，然后再利用算数右移的特点，向右移位移时使用符号位填充。
+
+```
+int conditional(int x)
+{
+    int mask = (!x)<<31>>31;
+    return ((~mask)&y) + (mask&z);
+}
+```
+
+## isLessOrEqual
+
+### 题目要求
+
+```
+/* 
+ * isLessOrEqual - if x <= y  then return 1, else return 0 
+ *   Example: isLessOrEqual(4,5) = 1.
+ *   Legal ops: ! ~ & ^ | + << >>
+ *   Max ops: 24
+ *   Rating: 3
+ */
+```
+
+### 解题思路
+
+这道题目需要注意的点是，两符号不同的数进行相减操作时有可能造成溢出。因此我们需要两种情况来分析。
+
+1. 两数同符号
+   
+   当两数同为正或同为负时，比较大小可以使用减法，然后判断差的符号位即可。
+   
+2. 两数不同符号
+
+   此时只要y是正数，即符号位为0，就应该返回1
+
+判断是否同符号可以对符号位进行异或操作 (x>>31&0x01)^(y>>31&0x01)，然后分别用两分支来对不同的情况进行处理。
+
+> 需要注意的是，两分支之间使用的是**+**号，因此需要保证当一个分支满足的时候，另外一个分支是0.
+
+```c
+in isLessOrEqual(int x, int y)
+{
+    int is_diff = (x>>31&0x01)^(y>>31&0x01);
+    int is_y_not_less_than_x = !((y+(~x)+1)>>31&0x01);
+    return ((!is_diff)&is_y_not_less_than_x) + (diff&(!(y>>31&0x01)));
+}
+```
+
+## logicalNeg
+
+### 题目要求
+
+```
+/* 
+ * logicalNeg - implement the ! operator, using all of 
+ *              the legal operators except !
+ *   Examples: logicalNeg(3) = 0, logicalNeg(0) = 1
+ *   Legal ops: ~ & ^ | + << >>
+ *   Max ops: 12
+ *   Rating: 4 
+ */
+```
+
+### 解题思路
+
+一般情况下，x与相反数((~x)+1)按位或，结果的符号位为1。但是，0是一个特例，因为0的相反数也是0。
+
+然后我们可以利用算数右移31位，用符号位填充。当x为0时，0|((~0)+1)=0，符号位是0，算数右移时使用0填充，最终的结果是0。而当x不为0时，x|((~x)+1) < 0, 符号位为1，算数右移时使用1填充。最后将结果加1，满足题目要求。
+
+```c
+int logicalNeg(int x)
+{
+    return (x|(~x)+1))>>31+0x01;
+}
+```
+
+## howManyBits
+
+### 题目要求
+
+```
+/* howManyBits - return the minimum number of bits required to represent x in
+ *             two's complement
+ *  Examples: howManyBits(12) = 5
+ *            howManyBits(298) = 10
+ *            howManyBits(-5) = 4
+ *            howManyBits(0)  = 1
+ *            howManyBits(-1) = 1
+ *            howManyBits(0x80000000) = 32
+ *  Legal ops: ! ~ & ^ | + << >>
+ *  Max ops: 90
+ *  Rating: 4
+ */
+```
+
+### 解题思路
+
+表示一个数需要用到的最少位数，需要将该问题分为正负两种情况来讨论。
+
+1. 正数
+
+   找到最高的为1的位，以0x05为例，最高的为1的位是3，再加上符号位，因此只需要4位二进制就可以表示0x05。
+
+   ```
+   ------------------------------
+   |    0x05   | 0 0 0 0 0 1 0 1|
+   ------------------------------
+   ```
+
+   
+
+2. 负数
+
+   找到最高的为1的位，以0xF5为例，最高的为0的位数4，再加上符号位，因此只需要5位二进制就可以表示。
+
+   ```
+   ------------------------------
+   |    0xF5   | 1 1 1 1 0 1 0 1|
+   ------------------------------
+   ```
+
+   如果我们先把负数按位取反，就可以将问题转化为与正数情况一样的查找最高的为1的位。
+
+说到这里，我们就可以使用二分查找法来解决该问题。
+
+
+
+```c
+int howManyBits(int x)
+{
+    int b16, b8, b4, b2, b1, b0;
+  	int sign = x>>31;  
+  	//根据正负预处理, x的符号位为0
+    x = (sign&(~x))+(!sign&x);
+    //x的符号位为0，因此在进行算数右移时，使用0来填充，因此位移后高16位为0，原来的高16位移到低16位。然后根据使用!来判断是否为0来判断该16位是否含有1。如果有1，则b16为16，否则为0》
+    b16 = !!(x>>16)<<4;
+    // 当高16中含有1时，b16为16。将高16为移到低16位，然后再进行二分处理。
+    x = x>>b16;
+    b8 = !!(x>>8)<<3;
+    x = x>>b8;
+    b4 = !!(x>>4)<<2;
+    x = x>>b4;
+    b2 = !!(x>>2)<<1;
+    x = x>>b1;
+    b0 = x;
+    return b16+b8+b4+b2+b1+b0;
+}
+```
+
