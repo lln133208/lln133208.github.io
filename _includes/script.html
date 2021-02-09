@@ -4,7 +4,9 @@
 {% if page.searchPage -%}
 <script type="text/javascript" src="{{site.baseurl}}/static/js/search.js?t={{ buildAt }}"></script>
 {% endif %}
-
+<script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
 {%- if site.extClickEffect %}
 <!-- 点击页面文字冒出特效 -->
 <script>

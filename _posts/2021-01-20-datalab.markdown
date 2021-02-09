@@ -374,3 +374,124 @@ int howManyBits(int x)
 }
 ```
 
+## floatScale2
+
+### 题目要求
+
+```
+//float
+/* 
+ * floatScale2 - Return bit-level equivalent of expression 2*f for
+ *   floating point argument f.
+ *   Both the argument and result are passed as unsigned int's, but
+ *   they are to be interpreted as the bit-level representation of
+ *   single-precision floating point values.
+ *   When argument is NaN, return argument
+ *   Legal ops: Any integer/unsigned operations incl. ||, &&. also if, while
+ *   Max ops: 30
+ *   Rating: 4
+ */
+```
+
+### 解题思路
+
+该题目需要分情况讨论：
+
+* exp等于0
+
+  该情况下为**非规格化浮点数**（包含0.0）。该情况下只需要整体左移，相当于将尾数乘2，在这里还分为两个情况，以8bit的浮点数为例，其中最高位是符号位，第四位是尾数，中间三位是指数 exp
+
+  
+
+  * 尾数溢出,  尾数的最高位的1移到了指数位
+
+    位移前
+
+    ```
+       -------------------
+       | 0 0 0 0 1 0 0 0 | 
+       -------------------
+    ```
+
+    $$
+    (-1)^0*(0.1000)_2*2^{-6} = \frac{1}{2}*2^{-6} = 2^{-7}
+    $$
+
+    左移一位
+
+    ```
+      --------------------
+      | 0 0 0 1 0 0 0 0 |
+      --------------------
+    ```
+
+    $$
+    (-1)^0*(1.0000)_2*2^{-6} = 2^{-6}
+    $$
+
+    
+
+    左移后变成了左移前的2倍，符合题目要求。
+
+  * 尾数不溢出
+
+    位移前
+
+    ```
+    -------------------
+    | 0 0 0 0 0 1 0 0 |
+    -------------------
+    ```
+
+    $$
+    (-1)^0*(0.0100)_2*2^{-6} = \frac{1}{4}*2^{-6} = 2^{-8}
+    $$
+
+    左移一位
+
+    ```
+    -------------------
+    | 0 0 0 0 1 0 0 0 |
+    -------------------
+    ```
+
+    $$
+    (-1)^0*(0.1000)_2*2^{-6} = \frac{1}{2}*2^{-6} = 2^{-7}
+    $$
+
+    左移后变成了左移前的2倍，同样符号要求。
+
+  * 指数和尾数都为0时，表示为浮点数0.0。左移一位，还是0.
+
+  > 左移一位会覆盖掉符号位，因此需要将原符号位赋于位移结果。
+
+* exp 等于 0xff
+
+  * 尾数等于0时，根据符号位分别表示正无穷大或者负无穷大，正(负)无穷大乘2依然是正(负)无穷大，直接返回
+  * 尾数不等于0时，该值为NaN(Not a Number)，直接返回
+
+* 0<exp<255
+
+  此时被称为**规格化浮点数**，只需要将指数exp加一即可，同时需要注意符号位。
+
+  * exp+1 小于0xff时，正常返回
+  * exp+1 等于0xff时，返回无穷大
+
+
+
+```c
+unsigned floatScale2(unsigned uf) {
+  unsigned int exp = uf&0x7f800000;
+  unsigned int sign = uf&0x80000000;
+
+  if(exp == 0)
+    return (uf<<1)|sign;
+  if(exp == 0x7f800000)
+    return uf;
+  exp=exp+0x00800000;
+  if(exp==0x7f800000)
+    return 0x7f800000|sign;
+  return sign+exp+(uf&0x007fffff);
+}
+```
+
