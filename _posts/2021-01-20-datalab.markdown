@@ -495,3 +495,135 @@ unsigned floatScale2(unsigned uf) {
 }
 ```
 
+## floatFloat2Int
+
+### 题目要求
+
+```
+/* 
+ * floatFloat2Int - Return bit-level equivalent of expression (int) f
+ *   for floating point argument f.
+ *   Argument is passed as unsigned int, but
+ *   it is to be interpreted as the bit-level representation of a
+ *   single-precision floating point value.
+ *   Anything out of range (including NaN and infinity) should return
+ *   0x80000000u.
+ *   Legal ops: Any integer/unsigned operations incl. ||, &&. also if, while
+ *   Max ops: 30
+ *   Rating: 4
+ */
+```
+
+### 解题思路
+
+IEEE的浮点数表示
+
+$$
+\begin{aligned}
+& F = (-1)^s*M*2^E \\
+& s: 符号位 \\
+& M: 尾数，二进制小数,范围为[1, 2) \\
+& E: 阶码
+\end{aligned}
+$$
+
+而计算机对浮点数进行编码时，以单精度浮点数为例，其结构如下
+
+```
+---------------------------------
+| s |    exp    |      frac     |
+---------------------------------
+```
+
+其中 s, exp, frac 分别为 1 位，8 位 和 23 位。
+
+* s 用来表示符号位
+* exp为阶码字段，通过一些特定规则表示E(exp并不直接等于E)
+* frac小数字段，用来编码尾数M
+
+题目中的要求是将浮点数转变为整型，
+
+* 当E>31时，超过了Int型可以表示的范围
+
+* 当E<0时，该数为小于1的数，因此取0
+
+* 当 0<=E<=31时，此时该浮点数为规格化浮点数（非规格化浮点数E=1-bias=1-127=-126）。\
+
+  f为浮点数小数，其二进制表示为
+  $$
+  0.f_{23}f_{22}...f_0
+  $$
+  则尾数定义为
+  $$
+  M = 1 + f
+  $$
+  需要判断指数E是否大于小数字段的长度23
+
+  * 当 E > 23
+
+    说明有E位需要在小数点左侧，而此时只有23位，因此我们需要左移(E-23)位。
+
+  * 当 E < 23
+
+    说明(23-E)位的小数字段需要在小数点右侧，因此需要右移(23-E)位。
+
+  最后注意需要考虑符号位。
+
+以下是本题的正确解法。
+
+```
+int floatFloat2Int(unsigned uf) {
+  // E = exp - bias
+    int E = ((uf>>23)&0xff) - 127;
+    unsigned int sign = uf&0x80000000;
+    int frac = (uf&0x007fffff)|0x00800000;
+
+    if (E>31)
+        return 0x80000000u;
+    if (E<0)
+        return 0;
+    int value = ((E>23)?(frac<<(E-23)):(frac>>(23-E)));
+    return sign?-value:value;
+}
+```
+
+## floatPower2
+
+### 题目要求
+
+```
+/* 
+ * floatPower2 - Return bit-level equivalent of the expression 2.0^x
+ *   (2.0 raised to the power x) for any 32-bit integer x.
+ *
+ *   The unsigned value that is returned should have the identical bit
+ *   representation as the single-precision floating-point number 2.0^x.
+ *   If the result is too small to be represented as a denorm, return
+ *   0. If too large, return +INF.
+ * 
+ *   Legal ops: Any integer/unsigned operations incl. ||, &&. Also if, while 
+ *   Max ops: 30 
+ *   Rating: 4
+ */
+
+```
+
+### 解题思路
+
+$$
+2.0^x = (-1)^0*(1.0)_2*2^x
+$$
+
+根据上述推导，其实x就相当于E，x + bias 就是exp。也可以得知该浮点数为**规格化**浮点数（因为尾数M为1.x），因此exp的范围为**(0, 255)**
+
+```
+unsigned floatPower2(int x) {
+  int exp = x + 127;
+  if (exp<=0)
+    return 0;
+  if (exp>=0xff)
+    return 0x7f800000;
+  return exp<<23;
+}
+
+```
